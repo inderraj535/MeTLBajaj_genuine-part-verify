@@ -1,45 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Part Verified</title>
-  <style>
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #eafaf1;
-      color: #123b2d;
-      font-family: Arial, Helvetica, sans-serif;
-      text-align: center;
-      padding: 20px;
-    }
-    .card {
-      background: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-      max-width: 480px;
-      padding: 30px 24px;
-    }
-    h1 {
-      margin: 0 0 12px;
-      font-size: 2rem;
-      color: #0d7a45;
-    }
-    p {
-      margin: 0;
-      line-height: 1.6;
-      font-size: 1.05rem;
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Genuine Part Verified</title>
+<style>
+:root{--blue:#00529B;--navy:#0B3D91;--ink:#1B2530;--green:#1B9A4B;--bg:#F7F8FB}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);font-family:Arial,Helvetica,sans-serif;color:var(--ink);display:flex;justify-content:center}
+.screen{width:min(100%,420px);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 22px 28px;position:relative;overflow:hidden;background:radial-gradient(circle at 50% 14%,#E3ECF7 0,var(--bg) 55%)}
+.topbar{position:absolute;top:0;left:0;right:0;height:10px;background:var(--blue);animation:slide 1.1s ease-out both}
+.logo-box{margin-top:40px;width:200px;height:200px;background:var(--blue);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;animation:fadeUp .7s .2s ease-out both}
+.logo-box .bj{font-size:34px;font-weight:bold;letter-spacing:.08em}
+.logo-box .gp{font-size:30px;margin-top:6px}
+.logo-box .line{width:120px;height:2px;background:#fff;margin-top:8px}
+h1{margin:26px 0 0;font-size:30px;line-height:1.15;text-align:center;color:var(--blue);animation:fadeUp .6s .5s ease-out both}
+.sub{margin:10px 0 0;font-size:15px;font-weight:bold;letter-spacing:.08em;animation:fadeUp .6s .8s ease-out both}
+.big{margin:8px 0 0;font-size:24px;font-weight:bold;color:var(--navy);text-align:center;line-height:1.25;animation:fadeUp .6s 1s ease-out both}
+.tick{margin:24px 0 0;width:118px;height:118px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;animation:pop .7s 1.3s cubic-bezier(.2,1.6,.4,1) both}
+.tick svg{width:64px;height:64px}
+.tick path{stroke:#fff;stroke-width:14;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:70;stroke-dashoffset:70;animation:draw .5s 1.8s ease-out forwards}
+.tag{margin:34px 0 0;font-size:17px;font-weight:bold;letter-spacing:.06em;text-align:center;animation:fadeUp .6s 2.2s ease-out both}
+.tag2{margin:6px 0 0;font-size:18px;font-weight:bold;color:var(--blue);letter-spacing:.06em;text-align:center;animation:fadeUp .6s 2.4s ease-out both}
+.box{margin-top:26px;width:100%;border:2px solid var(--blue);border-radius:14px;padding:16px;background:#fff;text-align:center;animation:fadeUp .6s 2.6s ease-out both}
+.box b{display:block;color:var(--green);font-size:17px;margin-bottom:6px}
+.box span{font-size:16px}
+.partner{margin-top:24px;width:200px;height:120px;background:#fff;border:1px solid #D5D9DF;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#7B828C;font-size:13px;text-align:center;padding:10px;animation:fadeUp .6s 2.9s ease-out both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes slide{from{transform:translateX(-100%)}to{transform:none}}
+@keyframes pop{from{transform:scale(.2);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes draw{to{stroke-dashoffset:0}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;opacity:1!important}.tick path{stroke-dashoffset:0}}
+</style>
 </head>
 <body>
-  <div class="card">
-    <h1>Genuine Part</h1>
-    <p>The part code has been verified successfully. This part is authentic.</p>
+<div class="screen">
+  <div class="topbar"></div>
+  <div class="logo-box">
+    <div class="bj">BAJAJ</div>
+    <div class="gp">GENUINE</div>
+    <div class="gp" style="font-size:24px;margin-top:0">parts</div>
+    <div class="line"></div>
   </div>
+
+  <h1>CONGRATULATIONS!</h1>
+  <p class="sub">YOU HAVE VERIFIED</p>
+  <p class="big">A GENUINE BAJAJ<br>ORIGINAL PART!</p>
+
+  <div class="tick" aria-hidden="true">
+    <svg viewBox="0 0 100 100"><path d="M18 52 L40 74 L82 28"/></svg>
+  </div>
+
+  <p class="tag">YOUR LIFE. YOUR PRIDE.</p>
+  <p class="tag2">YOUR GENUINE BAJAJ.</p>
+
+  <div class="box">
+    <b>Ride with confidence.</b>
+    <span>Choose quality you can trust.</span>
+  </div>
+
+  <div class="partner">Partner or dealer logo<br>(add here)</div>
+</div>
 </body>
 </html>
