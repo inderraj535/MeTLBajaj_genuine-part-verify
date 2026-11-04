@@ -3,220 +3,48 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Bajaj Genuine Parts - QR Scanner</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+<title>Verifying Part</title>
 <style>
-:root{--blue:#00529B;--navy:#0B3D91;--gold:#F6B800;--green:#1B9A4B;--red:#C8102E;--bg:#F2F5FA;--ink:#1B2530}
-*{box-sizing:border-box}
-body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--ink)}
-header{background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;padding:22px 16px 30px;text-align:center;border-bottom-left-radius:28px;border-bottom-right-radius:28px;box-shadow:0 6px 16px rgba(0,82,155,.3)}
-.logo-card{display:inline-block;background:#fff;border-radius:16px;padding:10px;box-shadow:0 4px 10px rgba(0,0,0,.2)}
-.logo-card img{height:90px;display:block}
-header h1{margin:14px 0 0;font-size:20px;letter-spacing:.05em}
-header p{margin:4px 0 0;font-size:13px;opacity:.85}
-.main{max-width:480px;margin:-16px auto 0;padding:0 16px 30px}
-.card{background:#fff;border-radius:18px;padding:16px;box-shadow:0 4px 14px rgba(0,0,0,.08);margin-top:16px}
-#reader{width:100%;border-radius:12px;overflow:hidden;min-height:20px}
-.btn{display:block;width:100%;border:0;border-radius:12px;padding:14px;font-size:16px;font-weight:bold;cursor:pointer;margin-top:10px}
-.btn-blue{background:var(--blue);color:#fff}
-.btn-gold{background:var(--gold);color:var(--navy)}
-.btn-grey{background:#e5e9f0;color:var(--ink)}
-input{width:100%;padding:13px;font-size:16px;border:2px solid #cfd8e6;border-radius:10px;font-family:monospace}
-.row{display:flex;gap:8px;margin-top:10px}
-.row input{flex:1}
-.row button{width:auto;margin-top:0;padding:0 18px}
-.hint{font-size:13px;color:#5b6675;text-align:center;margin-top:8px}
-#result{display:none;text-align:center}
-.badge{width:110px;height:110px;border-radius:50%;margin:8px auto;display:flex;align-items:center;justify-content:center;color:#fff;font-size:56px;font-weight:bold;animation:pop .5s cubic-bezier(.2,1.6,.4,1)}
-.ok{background:var(--green)}
-.bad{background:var(--red)}
-#resultTitle{font-size:22px;font-weight:bold;margin:6px 0}
-#resultCode{font-family:monospace;color:#5b6675;font-size:14px;margin-bottom:6px}
-.status{text-align:center;font-size:14px;color:#5b6675;min-height:20px;margin-top:10px}
-.spinner{width:36px;height:36px;border:4px solid #dbe4f0;border-top-color:var(--blue);border-radius:50%;margin:10px auto;animation:spin 1s linear infinite;display:none}
-h3{margin:0 0 10px;color:var(--navy);font-size:16px}
-#history{list-style:none;padding:0;margin:0}
-#history li{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #eef2f7;font-size:14px}
-.tag{padding:4px 10px;border-radius:20px;font-size:12px;font-weight:bold;color:#fff}
-footer{text-align:center;margin-top:24px}
-footer .label{font-size:12px;color:#7a8594;margin-bottom:8px}
-footer .logo-card img{height:60px}
-@keyframes pop{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
-@keyframes spin{to{transform:rotate(360deg)}}
+body{font-family:Arial,Helvetica,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#F7F8FB;color:#1B2530;text-align:center;padding:20px}
+#msg{max-width:420px;line-height:1.5;font-size:17px}
 </style>
 </head>
 <body>
-<header>
-  <div class="logo-card"><img src="bajaj_genuine.png" alt="Bajaj Genuine Parts"></div>
-  <h1>GENUINE PART VERIFIER</h1>
-  <p>Scan the QR code on your Bajaj part to confirm it is original</p>
-</header>
-
-<div class="main">
-  <div class="card">
-    <div id="reader"></div>
-    <button class="btn btn-blue" id="startBtn" onclick="startScanner()">Start Camera Scan</button>
-    <button class="btn btn-grey" id="stopBtn" onclick="stopScanner()" style="display:none">Stop Camera</button>
-    <div class="hint">Point the camera at the QR code on the part</div>
-  </div>
-
-  <div class="card">
-    <h3>Enter code manually</h3>
-    <div class="row">
-      <input id="manual" placeholder="e.g. MeTLMLP6780">
-      <button class="btn btn-gold" onclick="verifyManual()">Verify</button>
-    </div>
-  </div>
-
-  <div class="card" id="result">
-    <div class="badge" id="badge"></div>
-    <div id="resultTitle"></div>
-    <div id="resultCode"></div>
-    <button class="btn btn-blue" onclick="scanNext()">Scan next part</button>
-  </div>
-
-  <div class="status" id="status"></div>
-  <div class="spinner" id="spinner"></div>
-
-  <div class="card">
-    <h3>Recent checks</h3>
-    <ul id="history"><li style="color:#7a8594">No checks yet</li></ul>
-  </div>
-
-  <footer>
-    <div class="label">Powered by</div>
-    <div class="logo-card"><img src="metl_logo.png" alt="MeTL Group"></div>
-  </footer>
-</div>
+<p id="msg">Verifying part...</p>
 
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8lD0APM5hquqBb35Cszm_IahhdmBn8LxKYqK5BSLzzxh7psIHZtMO6op9z-GTW7imFg/exec";
-let qr = null;
-let busy = false;
-const checks = [];
+const code = new URLSearchParams(location.search).get("c") || "";
+const msg = document.getElementById("msg");
+const callbackName = "verifyResult_" + Date.now();
+let done = false;
 
-// Accepts either a full verification link (?c=CODE) or a bare code
-function extractCode(text) {
-  try {
-    const c = new URL(text).searchParams.get("c");
-    if (c) return c.trim();
-  } catch (e) {}
-  return text.trim();
+function showFailure(text) {
+  if (done) return;
+  done = true;
+  msg.textContent = text;
 }
 
-async function startScanner() {
-  if (qr) return;
-  setStatus("Starting camera...");
-  qr = new Html5Qrcode("reader");
-  try {
-    await qr.start(
-      { facingMode: "environment" },
-      { fps: 10, qrbox: 230 },
-      onScanSuccess,
-      function () {}
-    );
-    document.getElementById("startBtn").style.display = "none";
-    document.getElementById("stopBtn").style.display = "block";
-    setStatus("Camera ready. Scanning...");
-  } catch (err) {
-    qr = null;
-    setStatus("Camera could not start. Allow camera access, or enter the code manually.");
-  }
-}
+window[callbackName] = function (data) {
+  if (done) return;
+  done = true;
+  location.replace(data && data.status === "genuine" ? "indexorg2.html" : "Fake2.html");
+};
 
-async function stopScanner() {
-  if (!qr) return;
-  try { await qr.stop(); qr.clear(); } catch (e) {}
-  qr = null;
-  document.getElementById("startBtn").style.display = "block";
-  document.getElementById("stopBtn").style.display = "none";
-}
-
-function onScanSuccess(text) {
-  if (busy) return;
-  stopScanner();
-  verifyCode(extractCode(text));
-}
-
-function verifyManual() {
-  const code = document.getElementById("manual").value.trim();
-  if (!code) { setStatus("Please enter a code."); return; }
-  verifyCode(code);
-}
-
-function verifyCode(code) {
-  if (busy) return;
-  busy = true;
-  setStatus("");
-  document.getElementById("result").style.display = "none";
-  document.getElementById("spinner").style.display = "block";
-
-  const cbName = "cb_" + Date.now();
+if (!code) {
+  showFailure("No part code found. Please scan the QR code again.");
+} else {
   const script = document.createElement("script");
-
-  function finish() {
-    clearTimeout(timer);
-    delete window[cbName];
-    script.remove();
-    busy = false;
-    document.getElementById("spinner").style.display = "none";
-  }
-
-  const timer = setTimeout(function () {
-    finish();
-    setStatus("No response from the server. Check the internet and try again.");
-  }, 15000);
-
-  window[cbName] = function (data) {
-    finish();
-    showResult(code, data && data.status === "genuine");
-  };
+  script.src = SCRIPT_URL + "?c=" + encodeURIComponent(code) + "&callback=" + callbackName;
   script.onerror = function () {
-    finish();
-    setStatus("Could not reach the server. Try again.");
+    showFailure("Could not verify the part. Please check your internet connection and try again.");
   };
-  script.src = SCRIPT_URL + "?c=" + encodeURIComponent(code) + "&callback=" + cbName;
   document.body.appendChild(script);
+
+  setTimeout(function () {
+    showFailure("Verification timed out. Please try again.");
+  }, 15000);
 }
-
-function showResult(code, genuine) {
-  const badge = document.getElementById("badge");
-  badge.className = "badge " + (genuine ? "ok" : "bad");
-  badge.textContent = genuine ? "✓" : "✕";
-  const title = document.getElementById("resultTitle");
-  title.textContent = genuine ? "Genuine Bajaj Part" : "Duplicate / Not Genuine";
-  title.style.color = genuine ? "var(--green)" : "var(--red)";
-  document.getElementById("resultCode").textContent = "Code: " + code;
-  document.getElementById("result").style.display = "block";
-
-  checks.unshift({ code: code, genuine: genuine, time: new Date().toLocaleTimeString() });
-  renderHistory();
-}
-
-function renderHistory() {
-  const list = document.getElementById("history");
-  list.innerHTML = "";
-  checks.slice(0, 10).forEach(function (h) {
-    const li = document.createElement("li");
-    const left = document.createElement("span");
-    left.textContent = h.code + "  (" + h.time + ")";
-    const tag = document.createElement("span");
-    tag.className = "tag " + (h.genuine ? "ok" : "bad");
-    tag.textContent = h.genuine ? "GENUINE" : "DUPLICATE";
-    li.appendChild(left);
-    li.appendChild(tag);
-    list.appendChild(li);
-  });
-}
-
-function scanNext() {
-  document.getElementById("result").style.display = "none";
-  document.getElementById("manual").value = "";
-  setStatus("");
-  startScanner();
-}
-
-function setStatus(t) { document.getElementById("status").textContent = t; }
 </script>
 </body>
 </html>
