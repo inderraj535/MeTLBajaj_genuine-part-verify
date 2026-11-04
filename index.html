@@ -121,10 +121,23 @@
 
         window[callbackName] = function (data) {
           if (finished) return;
-          finished = true;
-          cleanup();
-          const destination = data && data.status === "genuine" ? "indexorg2.html" : "Fake2.html";
-          location.href = new URL(destination, location.href).toString();
+          const status = data && typeof data.status === "string"
+            ? data.status.trim().toLowerCase()
+            : "";
+
+          if (status === "genuine") {
+            finished = true;
+            cleanup();
+            location.href = new URL("indexorg2.html", location.href).toString();
+          } else if (status === "fake") {
+            finished = true;
+            cleanup();
+            location.href = new URL("Fake2.html", location.href).toString();
+          } else {
+            // Never label a part fake just because the service returned an
+            // empty, malformed, or otherwise unexpected response.
+            finishError("The verification service returned an unexpected result. No authenticity result was shown; please try again or contact support.");
+          }
         };
         script.onerror = function () {
           finishError("Could not reach the verification service. Check your connection and try again.");
