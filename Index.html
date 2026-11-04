@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verifying Part</title>
+<style>
+body{font-family:Arial,Helvetica,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#F7F8FB;color:#1B2530;text-align:center;padding:20px}
+</style>
+</head>
+<body>
+<p id="msg">Verifying part...</p>
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8lD0APM5hquqBb35Cszm_IahhdmBn8LxKYqK5BSLzzxh7psIHZtMO6op9z-GTW7imFg/exec";
+const code = new URLSearchParams(location.search).get("c") || "";
+
+async function verify() {
+  try {
+    const res = await fetch(SCRIPT_URL + "?c=" + encodeURIComponent(code));
+    const data = await res.json();
+    location.replace(data.status === "genuine" ? "indexorg2.html" : "Fake2.html");
+  } catch (err) {
+    document.getElementById("msg").textContent =
+      "Could not verify the part. Please check your internet connection and try again.";
+  }
+}
+verify();
+</script>
+</body>
+</html>
