@@ -28,10 +28,15 @@ h1{margin:26px 0 0;font-size:30px;line-height:1.15;text-align:center;color:var(-
 .box span{font-size:16px}
 .partner{margin-top:24px;width:200px;height:120px;background:#fff;border:1px solid #D5D9DF;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#7B828C;font-size:13px;text-align:center;padding:10px;animation:fadeUp .6s 2.9s ease-out both}
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes fadeOnly{from{opacity:0}to{opacity:1}}
 @keyframes slide{from{transform:translateX(-100%)}to{transform:none}}
 @keyframes pop{from{transform:scale(.2);opacity:0}to{transform:scale(1);opacity:1}}
 @keyframes draw{to{stroke-dashoffset:0}}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;opacity:1!important}.tick path{stroke-dashoffset:0}}
+@media (prefers-reduced-motion:reduce){
+  .topbar{animation:none}
+  .logo-box,h1,.sub,.big,.tick,.tag,.tag2,.box,.partner{animation:fadeOnly .25s ease-out both}
+  .tick path{animation:none;stroke-dashoffset:0}
+}
 </style>
 </head>
 <body>
