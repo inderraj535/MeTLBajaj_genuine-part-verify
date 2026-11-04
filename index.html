@@ -1,50 +1,173 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Verifying Part</title>
-<style>
-body{font-family:Arial,Helvetica,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#F7F8FB;color:#1B2530;text-align:center;padding:20px}
-#msg{max-width:420px;line-height:1.5;font-size:17px}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f8fb">
+  <title>Bajaj Genuine Part Verification</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      background: #f7f8fb;
+      color: #1b2530;
+    }
+    main {
+      width: 100%;
+      max-width: 480px;
+      padding: 28px 22px;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 8px 28px rgba(27, 37, 48, .09);
+      text-align: center;
+    }
+    h1 { margin: 0 0 10px; font-size: 1.5rem; }
+    p { line-height: 1.5; }
+    #reader { width: 100%; margin: 20px auto; }
+    .manual { margin-top: 20px; padding-top: 18px; border-top: 1px solid #e5e9ef; }
+    label { display: block; margin-bottom: 8px; font-weight: 600; }
+    input, button {
+      width: 100%; min-height: 46px; border-radius: 8px; font: inherit;
+    }
+    input { padding: 10px 12px; border: 1px solid #b9c3cf; }
+    button { margin-top: 10px; border: 0; background: #135eab; color: #fff; font-weight: 700; cursor: pointer; }
+    button:disabled { opacity: .6; cursor: wait; }
+    #msg { min-height: 24px; margin: 12px 0 0; color: #394656; }
+    .hint { color: #596675; font-size: .92rem; }
+  </style>
 </head>
 <body>
-<p id="msg">Verifying part...</p>
+  <main>
+    <h1>Verify a Bajaj Part</h1>
+    <p>Point your camera at the part’s QR code, or enter its code below.</p>
+    <div id="scanner">
+      <div id="reader"></div>
+      <p class="hint">Allow camera access when your browser asks. Camera scanning requires a secure HTTPS page.</p>
+    </div>
+    <form class="manual" id="code-form">
+      <label for="part-code">Part code</label>
+      <input id="part-code" name="c" type="text" autocomplete="off" placeholder="Enter the code from the QR label" required>
+      <button id="verify-button" type="submit">Verify part</button>
+    </form>
+    <p id="msg" role="status" aria-live="polite"></p>
+  </main>
 
-<script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8lD0APM5hquqBb35Cszm_IahhdmBn8LxKYqK5BSLzzxh7psIHZtMO6op9z-GTW7imFg/exec";
-const code = new URLSearchParams(location.search).get("c") || "";
-const msg = document.getElementById("msg");
-const callbackName = "verifyResult_" + Date.now();
-let done = false;
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8lD0APM5hquqBb35Cszm_IahhdmBn8LxKYqK5BSLzzxh7psIHZtMO6op9z-GTW7imFg/exec";
+    const msg = document.getElementById("msg");
+    const form = document.getElementById("code-form");
+    const input = document.getElementById("part-code");
+    const button = document.getElementById("verify-button");
+    let scanner;
+    let verifying = false;
 
-function showFailure(text) {
-  if (done) return;
-  done = true;
-  msg.textContent = text;
-}
+    function extractCode(value) {
+      const scanned = (value || "").trim();
+      if (!scanned) return "";
+      try {
+        const url = new URL(scanned);
+        const code = url.searchParams.get("c");
+        if (code) return code.trim();
+      } catch (_) {
+        // A QR code containing a plain part code is expected; use it as-is.
+      }
+      return scanned;
+    }
 
-window[callbackName] = function (data) {
-  if (done) return;
-  done = true;
-  location.replace(data && data.status === "genuine" ? "indexorg2.html" : "Fake2.html");
-};
+    function stopScanner() {
+      if (!scanner || !scanner.isScanning) return Promise.resolve();
+      return scanner.stop().catch(function () {});
+    }
 
-if (!code) {
-  showFailure("No part code found. Please scan the QR code again.");
-} else {
-  const script = document.createElement("script");
-  script.src = SCRIPT_URL + "?c=" + encodeURIComponent(code) + "&callback=" + callbackName;
-  script.onerror = function () {
-    showFailure("Could not verify the part. Please check your internet connection and try again.");
-  };
-  document.body.appendChild(script);
+    function verifyCode(rawValue) {
+      if (verifying) return;
+      const code = extractCode(rawValue);
+      if (!code) {
+        msg.textContent = "Enter a part code or scan the QR code.";
+        return;
+      }
+      verifying = true;
+      button.disabled = true;
+      msg.textContent = "Verifying part…";
+      stopScanner().then(function () {
+        const callbackName = "verifyResult_" + Date.now() + "_" + Math.random().toString(36).slice(2);
+        let finished = false;
+        const script = document.createElement("script");
+        const timeout = setTimeout(function () {
+          finishError("Verification timed out. Please try again.");
+        }, 15000);
 
-  setTimeout(function () {
-    showFailure("Verification timed out. Please try again.");
-  }, 15000);
-}
-</script>
+        function cleanup() {
+          clearTimeout(timeout);
+          script.remove();
+          try { delete window[callbackName]; } catch (_) { window[callbackName] = undefined; }
+        }
+        function finishError(text) {
+          if (finished) return;
+          finished = true;
+          cleanup();
+          verifying = false;
+          button.disabled = false;
+          msg.textContent = text;
+          if (scanner && !scanner.isScanning) startScanner();
+        }
+
+        window[callbackName] = function (data) {
+          if (finished) return;
+          finished = true;
+          cleanup();
+          const destination = data && data.status === "genuine" ? "indexorg2.html" : "Fake2.html";
+          location.href = new URL(destination, location.href).toString();
+        };
+        script.onerror = function () {
+          finishError("Could not reach the verification service. Check your connection and try again.");
+        };
+        script.src = SCRIPT_URL + "?c=" + encodeURIComponent(code) + "&callback=" + encodeURIComponent(callbackName);
+        document.body.appendChild(script);
+      });
+    }
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+      verifyCode(input.value);
+    });
+
+    function startScanner() {
+      if (!window.Html5Qrcode) {
+        msg.textContent = "Camera scanner could not load. Enter the part code manually instead.";
+        return;
+      }
+      if (!scanner) scanner = new Html5Qrcode("reader");
+      scanner.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 250, height: 180 } },
+        function (decodedText) {
+          input.value = extractCode(decodedText);
+          msg.textContent = "QR code detected. Verifying…";
+          verifyCode(decodedText);
+        },
+        function () { /* Ignore frames that do not contain a QR code. */ }
+      ).then(function () {
+        msg.textContent = "Camera ready. Scan a QR code or enter the part code manually.";
+      }).catch(function () {
+        msg.textContent = "Camera unavailable or permission denied. Enter the part code manually.";
+      });
+    }
+
+    const queryCode = new URLSearchParams(location.search).get("c");
+    if (queryCode) {
+      input.value = queryCode;
+      verifyCode(queryCode);
+    } else {
+      startScanner();
+    }
+  </script>
 </body>
 </html>
